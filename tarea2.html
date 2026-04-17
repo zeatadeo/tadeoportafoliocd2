@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lenguajes de Diseño y Programación – Tarea 02</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue-deep:   #0a1628;
+      --blue-mid:    #1a3a6e;
+      --blue-bright: #2563eb;
+      --blue-light:  #60a5fa;
+      --blue-glow:   #93c5fd;
+      --cream:       #f5f0e8;
+      --white:       #ffffff;
+      --black:       #111111;
+      --gray:        #555555;
+      --gray-light:  #e8e4dc;
+      --code-bg:     #0d1117;
+      --code-text:   #e6edf3;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--black); }
+
+    /* ── BACK BUTTON ── */
+    .back-btn {
+      position: fixed; top: 22px; left: 22px; z-index: 100;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 18px 9px 14px;
+      background: rgba(10,22,40,.8); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.18); border-radius: 50px;
+      color: var(--white); text-decoration: none;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      transition: background .2s, transform .2s;
+    }
+    .back-btn:hover { background: var(--blue-bright); transform: translateX(-3px); }
+    .back-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── HERO – diagonal split ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--blue-deep);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding: 80px 24px 60px;
+      text-align: center;
+    }
+    /* Animated code rain background */
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(37,99,235,.04) 38px, rgba(37,99,235,.04) 39px),
+        repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(37,99,235,.04) 38px, rgba(37,99,235,.04) 39px);
+    }
+    /* Glowing orbs */
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .18; }
+    .orb1 { width: 500px; height: 500px; background: var(--blue-bright); top: -150px; left: -100px; animation: float1 8s ease-in-out infinite; }
+    .orb2 { width: 350px; height: 350px; background: #06b6d4; bottom: -100px; right: -80px; animation: float2 10s ease-in-out infinite; }
+    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,30px)} }
+
+    .hero-inner { position: relative; z-index: 2; max-width: 700px; }
+    .hero-tag {
+      font-size: .68rem; letter-spacing: .4em; text-transform: uppercase;
+      color: var(--blue-light); font-weight: 600; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .hero-tag::before, .hero-tag::after { content:''; width:30px; height:2px; background:var(--blue-light); }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: .95; color: var(--white);
+      text-shadow: 0 4px 40px rgba(37,99,235,.5);
+      margin-bottom: 12px;
+    }
+    .hero-title em { color: var(--blue-light); font-style: normal; display: block; }
+
+    .hero-sub {
+      font-family: 'Lora', serif; font-style: italic;
+      font-size: clamp(.9rem, 1.8vw, 1.1rem);
+      color: rgba(255,255,255,.5); line-height: 1.7; margin: 20px 0 36px;
+    }
+
+    /* Category pills */
+    .hero-pills { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .pill {
+      padding: 7px 18px; border-radius: 50px; font-size: .72rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid;
+    }
+    .pill-web   { border-color: #22d3ee; color: #22d3ee; }
+    .pill-desk  { border-color: #a78bfa; color: #a78bfa; }
+    .pill-design{ border-color: #fb923c; color: #fb923c; }
+
+    /* ── NAV TABS ── */
+    .sticky-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--blue-deep); border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex; justify-content: center; gap: 0; overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 16px 28px; font-size: .72rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.45); text-decoration: none;
+      border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap;
+    }
+    .nav-tab:hover { color: var(--white); }
+    .nav-tab.web   { --tab-color: #22d3ee; }
+    .nav-tab.desk  { --tab-color: #a78bfa; }
+    .nav-tab.design{ --tab-color: #fb923c; }
+    .nav-tab:hover { border-color: var(--tab-color,var(--blue-light)); color: var(--tab-color,var(--white)); }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: 80px 24px 60px;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 48px; padding-bottom: 20px;
+      border-bottom: 2px solid var(--gray-light);
+    }
+    .section-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .icon-web    { background: rgba(34,211,238,.12); }
+    .icon-desk   { background: rgba(167,139,250,.12); }
+    .icon-design { background: rgba(251,146,60,.12); }
+
+    .section-header-text .category-tag {
+      font-size: .65rem; letter-spacing: .3em; text-transform: uppercase;
+      font-weight: 700; margin-bottom: 6px;
+    }
+    .tag-web    { color: #0891b2; }
+    .tag-desk   { color: #7c3aed; }
+    .tag-design { color: #ea580c; }
+
+    .section-header-text h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem; letter-spacing: .04em; color: var(--blue-deep); line-height: 1;
+    }
+    .section-header-text p {
+      font-size: .85rem; color: var(--gray); margin-top: 6px; line-height: 1.5;
+    }
+
+    /* Language cards grid */
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    .lang-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(10,22,40,.08);
+      transition: transform .25s, box-shadow .25s;
+      display: flex; flex-direction: column;
+    }
+    .lang-card:hover { transform: translateY(-5px); box-shadow: 0 14px 40px rgba(10,22,40,.14); }
+
+    .lang-img-wrap { position: relative; height: 160px; overflow: hidden; }
+    .lang-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .4s;
+    }
+    .lang-card:hover .lang-img-wrap img { transform: scale(1.06); }
+
+    .lang-logo-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(10,22,40,.75); backdrop-filter: blur(6px);
+      border-radius: 8px; padding: 6px 12px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--white);
+    }
+    .badge-web    { border-left: 3px solid #22d3ee; }
+    .badge-desk   { border-left: 3px solid #a78bfa; }
+    .badge-design { border-left: 3px solid #fb923c; }
+
+    .lang-body { padding: 20px 22px 0; }
+    .lang-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; letter-spacing: .04em; color: var(--blue-deep); margin-bottom: 4px;
+    }
+    .lang-desc {
+      font-size: .82rem; color: var(--gray); line-height: 1.6; margin-bottom: 16px;
+    }
+
+    /* Syntax block */
+    .code-block {
+      margin: 0 0 0;
+      background: var(--code-bg);
+      border-radius: 0 0 16px 16px;
+      overflow: hidden;
+      margin-top: auto;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .code-dots { display: flex; gap: 5px; }
+    .code-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .code-lang-label {
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem; color: rgba(255,255,255,.3); letter-spacing: .1em;
+    }
+    .code-block pre {
+      font-family: 'Fira Code', monospace;
+      font-size: .78rem; line-height: 1.7;
+      color: var(--code-text);
+      padding: 16px 18px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    /* Syntax highlights */
+    .kw  { color: #ff7b72; }   /* keywords */
+    .fn  { color: #d2a8ff; }   /* functions */
+    .st  { color: #a5d6ff; }   /* strings */
+    .cm  { color: #8b949e; font-style: italic; } /* comments */
+    .nm  { color: #79c0ff; }   /* numbers/names */
+    .tg  { color: #7ee787; }   /* tags/selectors */
+    .at  { color: #ffa657; }   /* attributes/props */
+    .vl  { color: #a5d6ff; }   /* values */
+    .pn  { color: #e6edf3; }   /* punctuation */
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      max-width: 1100px; margin: 0 auto;
+      border: none; border-top: 1px solid var(--gray-light);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--blue-deep); color: rgba(255,255,255,.7);
+      text-align: center; padding: 32px 20px;
+      font-size: .8rem; letter-spacing: .08em; line-height: 1.9;
+    }
+    footer strong { color: var(--blue-light); font-weight: 700; }
+
+    @media(max-width:600px) {
+      .lang-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 3rem; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── BACK BUTTON ── -->
+  <a href="index.html" class="back-btn">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Regresar
+  </a>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+      <p class="hero-tag">Tarea 02 &nbsp;·&nbsp; Cultura Digital 2</p>
+      <h1 class="hero-title">Lenguajes de<br><em>Programación</em><br>y Diseño</h1>
+      <p class="hero-sub">Una guía visual por los principales lenguajes del desarrollo web, de escritorio y del diseño digital moderno.</p>
+      <div class="hero-pills">
+        <span class="pill pill-web">🌐 Desarrollo Web</span>
+        <span class="pill pill-desk">🖥️ Escritorio</span>
+        <span class="pill pill-design">🎨 Diseño y Maquetación</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STICKY NAV ── -->
+  <nav class="sticky-nav">
+    <a href="#web"    class="nav-tab web">🌐 Web</a>
+    <a href="#desktop" class="nav-tab desk">🖥️ Escritorio</a>
+    <a href="#design"  class="nav-tab design">🎨 Diseño</a>
+  </nav>
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECCIÓN 1 – DESARROLLO WEB               -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="web" class="section">
+    <div class="section-header">
+      <div class="section-icon icon-web">🌐</div>
+      <div class="section-header-text">
+        <div class="category-tag tag-web">Categoría 01</div>
+        <h2>Desarrollo Web</h2>
+        <p>Lenguajes que construyen, dan estilo e interactividad a las páginas y aplicaciones en Internet.</p>
+      </div>
+    </div>
+
+    <div class="lang-grid">
+
+      <!-- HTML -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600&q=80" alt="HTML" onerror="this.src='https://placehold.co/600x160/e34f26/ffffff?text=HTML'"/>
+          <span class="lang-logo-badge badge-web">HTML 5</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">HTML</div>
+          <p class="lang-desc">HyperText Markup Language. Es la estructura base de toda página web. Define el contenido mediante etiquetas semánticas.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">index.html</span>
+          </div>
+          <pre><span class="cm">&lt;!-- Estructura básica HTML5 --&gt;</span>
+<span class="pn">&lt;!</span><span class="kw">DOCTYPE</span> html<span class="pn">&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang</span>=<span class="st">"es"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;head&gt;</span>
+    <span class="tg">&lt;title&gt;</span>Mi página<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;/head&gt;</span>
+  <span class="tg">&lt;body&gt;</span>
+    <span class="tg">&lt;h1&gt;</span>Hola, mundo<span class="tg">&lt;/h1&gt;</span>
+    <span class="tg">&lt;p&gt;</span>Bienvenido a la web.<span class="tg">&lt;/p&gt;</span>
+  <span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+        </div>
+      </div>
+
+      <!-- CSS -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?w=600&q=80" alt="CSS" onerror="this.src='https://placehold.co/600x160/264de4/ffffff?text=CSS'"/>
+          <span class="lang-logo-badge badge-web">CSS 3</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">CSS</div>
+          <p class="lang-desc">Cascading Style Sheets. Controla la presentación visual: colores, tipografías, layouts, animaciones y diseño responsivo.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">styles.css</span>
+          </div>
+          <pre><span class="cm">/* Variables y estilos base */</span>
+<span class="tg">:root</span> <span class="pn">{</span>
+  <span class="at">--color-primario</span>: <span class="vl">#2563eb</span>;
+  <span class="at">--fuente</span>: <span class="vl">'Montserrat'</span>;
+<span class="pn">}</span>
+<span class="tg">h1</span> <span class="pn">{</span>
+  <span class="at">color</span>: <span class="vl">var(--color-primario)</span>;
+  <span class="at">font-size</span>: <span class="vl">2rem</span>;
+  <span class="at">text-align</span>: <span class="vl">center</span>;
+<span class="pn">}</span></pre>
+        </div>
+      </div>
+
+      <!-- JavaScript -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=600&q=80" alt="JavaScript" onerror="this.src='https://placehold.co/600x160/f7df1e/000000?text=JavaScript'"/>
+          <span class="lang-logo-badge badge-web">JS ES2024</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">JavaScript</div>
+          <p class="lang-desc">El lenguaje de la interactividad web. Permite manipular el DOM, consumir APIs, crear animaciones y aplicaciones completas.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">app.js</span>
+          </div>
+          <pre><span class="cm">// Función con async/await</span>
+<span class="kw">async function</span> <span class="fn">obtenerDatos</span>(url) <span class="pn">{</span>
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+  <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="st">`Datos: </span><span class="nm">${data.nombre}</span><span class="st">`</span>);
+<span class="pn">}</span>
+<span class="fn">obtenerDatos</span>(<span class="st">'https://api.ejemplo.com'</span>);</pre>
+        </div>
+      </div>
+
+      <!-- PHP -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80" alt="PHP" onerror="this.src='https://placehold.co/600x160/777bb4/ffffff?text=PHP'"/>
+          <span class="lang-logo-badge badge-web">PHP 8</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">PHP</div>
+          <p class="lang-desc">Lenguaje de servidor que potencia más del 70% de los sitios web del mundo, incluyendo WordPress y Facebook en sus inicios.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">index.php</span>
+          </div>
+          <pre><span class="pn">&lt;?php</span>
+<span class="cm">// Clase con tipado moderno</span>
+<span class="kw">class</span> <span class="fn">Usuario</span> <span class="pn">{</span>
+  <span class="kw">public function</span> <span class="fn">__construct</span>(
+    <span class="kw">private</span> <span class="nm">string</span> <span class="at">$nombre</span>,
+    <span class="kw">private</span> <span class="nm">int</span>    <span class="at">$edad</span>
+  ) <span class="pn">{}</span>
+  <span class="kw">public function</span> <span class="fn">saludar</span>()<span class="pn">:</span> <span class="nm">string</span> <span class="pn">{</span>
+    <span class="kw">return</span> <span class="st">"Hola, {$this->nombre}"</span>;
+  <span class="pn">}</span>
+<span class="pn">}</span>
+<span class="pn">?&gt;</span></pre>
+        </div>
+      </div>
+
+      <!-- TypeScript -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80" alt="TypeScript" onerror="this.src='https://placehold.co/600x160/3178c6/ffffff?text=TypeScript'"/>
+          <span class="lang-logo-badge badge-web">TypeScript</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">TypeScript</div>
+          <p class="lang-desc">Superset de JavaScript desarrollado por Microsoft que agrega tipado estático, mejorando la escalabilidad del código.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">usuario.ts</span>
+          </div>
+          <pre><span class="cm">// Interfaz y tipo genérico</span>
+<span class="kw">interface</span> <span class="fn">Producto</span> <span class="pn">{</span>
+  <span class="at">id</span>: <span class="nm">number</span>;
+  <span class="at">nombre</span>: <span class="nm">string</span>;
+  <span class="at">precio</span>: <span class="nm">number</span>;
+<span class="pn">}</span>
+<span class="kw">function</span> <span class="fn">formatear</span><span class="pn">&lt;</span><span class="nm">T</span><span class="pn">&gt;</span>(item: <span class="nm">T</span>): <span class="nm">string</span> <span class="pn">{</span>
+  <span class="kw">return</span> <span class="nm">JSON</span>.<span class="fn">stringify</span>(item, <span class="kw">null</span>, <span class="nm">2</span>);
+<span class="pn">}</span></pre>
+        </div>
+      </div>
+
+      <!-- SQL -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&q=80" alt="SQL" onerror="this.src='https://placehold.co/600x160/00758f/ffffff?text=SQL'"/>
+          <span class="lang-logo-badge badge-web">SQL / MySQL</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">SQL</div>
+          <p class="lang-desc">Structured Query Language. Lenguaje universal para gestionar bases de datos relacionales: consultar, insertar, actualizar y eliminar datos.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">consulta.sql</span>
+          </div>
+          <pre><span class="cm">-- Consulta con JOIN y filtros</span>
+<span class="kw">SELECT</span>
+  u.<span class="at">nombre</span>,
+  <span class="fn">COUNT</span>(p.<span class="at">id</span>) <span class="kw">AS</span> total_pedidos
+<span class="kw">FROM</span> <span class="nm">usuarios</span> u
+<span class="kw">JOIN</span> <span class="nm">pedidos</span> p <span class="kw">ON</span> u.<span class="at">id</span> = p.<span class="at">usuario_id</span>
+<span class="kw">WHERE</span> u.<span class="at">activo</span> = <span class="nm">1</span>
+<span class="kw">GROUP BY</span> u.<span class="at">nombre</span>
+<span class="kw">ORDER BY</span> total_pedidos <span class="kw">DESC</span>;</pre>
+        </div>
+      </div>
+
+    </div><!-- /lang-grid web -->
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECCIÓN 2 – ESCRITORIO                   -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="desktop" class="section">
+    <div class="section-header">
+      <div class="section-icon icon-desk">🖥️</div>
+      <div class="section-header-text">
+        <div class="category-tag tag-desk">Categoría 02</div>
+        <h2>Desarrollo de Escritorio</h2>
+        <p>Lenguajes de alto rendimiento para crear aplicaciones nativas que corren directamente en el sistema operativo.</p>
+      </div>
+    </div>
+
+    <div class="lang-grid">
+
+      <!-- Python -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&q=80" alt="Python" onerror="this.src='https://placehold.co/600x160/3776ab/ffffff?text=Python'"/>
+          <span class="lang-logo-badge badge-desk">Python 3.12</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Python</div>
+          <p class="lang-desc">El lenguaje más popular del mundo. Usado en IA, ciencia de datos, automatización, backends y aplicaciones de escritorio con Tkinter o PyQt.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">main.py</span>
+          </div>
+          <pre><span class="cm"># Clase con dataclass y list comprehension</span>
+<span class="kw">from</span> <span class="nm">dataclasses</span> <span class="kw">import</span> dataclass
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="fn">Alumno</span>:
+    nombre: <span class="nm">str</span>
+    calificacion: <span class="nm">float</span>
+
+alumnos = [<span class="fn">Alumno</span>(<span class="st">"Ana"</span>, <span class="nm">9.5</span>), <span class="fn">Alumno</span>(<span class="st">"Luis"</span>, <span class="nm">8.0</span>)]
+aprobados = [a <span class="kw">for</span> a <span class="kw">in</span> alumnos <span class="kw">if</span> a.calificacion >= <span class="nm">7</span>]
+<span class="fn">print</span>(<span class="st">f"Aprobados: </span><span class="nm">{len(aprobados)}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+
+      <!-- Java -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Java" onerror="this.src='https://placehold.co/600x160/ed8b00/ffffff?text=Java'"/>
+          <span class="lang-logo-badge badge-desk">Java 21</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Java</div>
+          <p class="lang-desc">Lenguaje orientado a objetos multiplataforma. Base de Android, sistemas empresariales y aplicaciones de escritorio con JavaFX.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">Main.java</span>
+          </div>
+          <pre><span class="cm">// Records y Stream API (Java moderno)</span>
+<span class="kw">record</span> <span class="fn">Punto</span>(<span class="nm">int</span> x, <span class="nm">int</span> y) <span class="pn">{}</span>
+
+<span class="kw">var</span> puntos = <span class="nm">List</span>.<span class="fn">of</span>(
+  <span class="kw">new</span> <span class="fn">Punto</span>(<span class="nm">1</span>,<span class="nm">2</span>), <span class="kw">new</span> <span class="fn">Punto</span>(<span class="nm">3</span>,<span class="nm">4</span>)
+);
+puntos.<span class="fn">stream</span>()
+  .<span class="fn">filter</span>(p -> p.x() > <span class="nm">0</span>)
+  .<span class="fn">forEach</span>(<span class="nm">System</span>.out::println);</pre>
+        </div>
+      </div>
+
+      <!-- C# -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?w=600&q=80" alt="C#" onerror="this.src='https://placehold.co/600x160/68217a/ffffff?text=C%23'"/>
+          <span class="lang-logo-badge badge-desk">C# .NET</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">C#</div>
+          <p class="lang-desc">Desarrollado por Microsoft. Ideal para aplicaciones Windows, videojuegos con Unity y desarrollo empresarial con el ecosistema .NET.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">Program.cs</span>
+          </div>
+          <pre><span class="cm">// LINQ y propiedades automáticas</span>
+<span class="kw">class</span> <span class="fn">Producto</span> <span class="pn">{</span>
+  <span class="kw">public</span> <span class="nm">string</span> Nombre <span class="pn">{</span> <span class="kw">get</span>; <span class="kw">set</span>; <span class="pn">}</span>
+  <span class="kw">public</span> <span class="nm">decimal</span> Precio <span class="pn">{</span> <span class="kw">get</span>; <span class="kw">set</span>; <span class="pn">}</span>
+<span class="pn">}</span>
+<span class="kw">var</span> caros = productos
+  .<span class="fn">Where</span>(p => p.Precio > <span class="nm">100</span>)
+  .<span class="fn">OrderBy</span>(p => p.Nombre)
+  .<span class="fn">ToList</span>();</pre>
+        </div>
+      </div>
+
+      <!-- Swift -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80" alt="Swift" onerror="this.src='https://placehold.co/600x160/fa7343/ffffff?text=Swift'"/>
+          <span class="lang-logo-badge badge-desk">Swift 5.9</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Swift</div>
+          <p class="lang-desc">Creado por Apple para macOS, iOS, watchOS y tvOS. Combina seguridad, velocidad y una sintaxis clara y expresiva.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">ContentView.swift</span>
+          </div>
+          <pre><span class="cm">// Struct con protocolo Codable</span>
+<span class="kw">struct</span> <span class="fn">Usuario</span>: <span class="nm">Codable</span> <span class="pn">{</span>
+  <span class="kw">let</span> <span class="at">nombre</span>: <span class="nm">String</span>
+  <span class="kw">var</span> <span class="at">edad</span>: <span class="nm">Int</span>
+  <span class="kw">var</span> <span class="at">esMayor</span>: <span class="nm">Bool</span> <span class="pn">{</span>
+    edad >= <span class="nm">18</span>
+  <span class="pn">}</span>
+<span class="pn">}</span>
+<span class="kw">let</span> user = <span class="fn">Usuario</span>(nombre: <span class="st">"Ana"</span>, edad: <span class="nm">20</span>)
+<span class="fn">print</span>(user.esMayor) <span class="cm">// true</span></pre>
+        </div>
+      </div>
+
+      <!-- Kotlin -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?w=600&q=80" alt="Kotlin" onerror="this.src='https://placehold.co/600x160/7f52ff/ffffff?text=Kotlin'"/>
+          <span class="lang-logo-badge badge-desk">Kotlin</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Kotlin</div>
+          <p class="lang-desc">Lenguaje moderno de JetBrains. Lenguaje oficial de Android que reemplaza a Java con una sintaxis más concisa y segura.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">Main.kt</span>
+          </div>
+          <pre><span class="cm">// Data class y extensiones</span>
+<span class="kw">data class</span> <span class="fn">Tarea</span>(
+  <span class="kw">val</span> <span class="at">titulo</span>: <span class="nm">String</span>,
+  <span class="kw">var</span> <span class="at">completada</span>: <span class="nm">Boolean</span> = <span class="kw">false</span>
+)
+<span class="kw">fun</span> <span class="nm">List</span>&lt;<span class="fn">Tarea</span>&gt;.<span class="fn">pendientes</span>() =
+  <span class="fn">filter</span> <span class="pn">{</span> !it.completada <span class="pn">}</span>
+
+<span class="kw">val</span> lista = <span class="fn">listOf</span>(<span class="fn">Tarea</span>(<span class="st">"Estudiar"</span>))
+<span class="fn">println</span>(lista.<span class="fn">pendientes</span>().<span class="at">size</span>)</pre>
+        </div>
+      </div>
+
+      <!-- C++ -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80" alt="C++" onerror="this.src='https://placehold.co/600x160/00599c/ffffff?text=C%2B%2B'"/>
+          <span class="lang-logo-badge badge-desk">C++ 23</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">C++</div>
+          <p class="lang-desc">El lenguaje del alto rendimiento. Usado en sistemas operativos, videojuegos AAA, motores gráficos y software de tiempo real.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">main.cpp</span>
+          </div>
+          <pre><span class="cm">// Plantillas y rango-for moderno</span>
+<span class="kw">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;iostream&gt;</span>
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> <span class="nm">T</span>&gt;
+<span class="nm">T</span> <span class="fn">suma</span>(<span class="kw">const</span> std::vector&lt;<span class="nm">T</span>&gt;&amp; v) <span class="pn">{</span>
+  <span class="nm">T</span> total{};
+  <span class="kw">for</span> (<span class="kw">const auto</span>&amp; x : v) total += x;
+  <span class="kw">return</span> total;
+<span class="pn">}</span></pre>
+        </div>
+      </div>
+
+    </div><!-- /lang-grid desktop -->
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECCIÓN 3 – DISEÑO Y MAQUETACIÓN         -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="design" class="section">
+    <div class="section-header">
+      <div class="section-icon icon-design">🎨</div>
+      <div class="section-header-text">
+        <div class="category-tag tag-design">Categoría 03</div>
+        <h2>Diseño y Maquetación</h2>
+        <p>Lenguajes y sistemas que definen la apariencia, la estructura visual y la presentación de contenido digital e impreso.</p>
+      </div>
+    </div>
+
+    <div class="lang-grid">
+
+      <!-- SASS/SCSS -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1561736778-92e52a7769ef?w=600&q=80" alt="SASS" onerror="this.src='https://placehold.co/600x160/cc6699/ffffff?text=SASS'"/>
+          <span class="lang-logo-badge badge-design">SASS / SCSS</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">SASS / SCSS</div>
+          <p class="lang-desc">Preprocesador de CSS que agrega variables, mixins, funciones y anidamiento para escribir estilos más mantenibles y reutilizables.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">estilos.scss</span>
+          </div>
+          <pre><span class="cm">// Mixin con parámetros</span>
+<span class="kw">@mixin</span> <span class="fn">flex-centro</span>($dir: row) <span class="pn">{</span>
+  <span class="at">display</span>: <span class="vl">flex</span>;
+  <span class="at">flex-direction</span>: <span class="vl">$dir</span>;
+  <span class="at">align-items</span>: <span class="vl">center</span>;
+  <span class="at">justify-content</span>: <span class="vl">center</span>;
+<span class="pn">}</span>
+<span class="tg">.tarjeta</span> <span class="pn">{</span>
+  <span class="kw">@include</span> <span class="fn">flex-centro</span>(column);
+  <span class="tg">&:hover</span> <span class="pn">{</span> <span class="at">opacity</span>: <span class="vl">.9</span>; <span class="pn">}</span>
+<span class="pn">}</span></pre>
+        </div>
+      </div>
+
+      <!-- Tailwind CSS -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1550439062-609e1531270e?w=600&q=80" alt="Tailwind" onerror="this.src='https://placehold.co/600x160/06b6d4/ffffff?text=Tailwind'"/>
+          <span class="lang-logo-badge badge-design">Tailwind CSS</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Tailwind CSS</div>
+          <p class="lang-desc">Framework de utilidades CSS que permite diseñar directamente en el HTML sin escribir hojas de estilos personalizadas. Muy adoptado en 2024.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">card.html</span>
+          </div>
+          <pre><span class="cm">&lt;!-- Tarjeta con clases utilitarias --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"bg-white rounded-2xl
+  shadow-lg p-6 flex flex-col
+  gap-4 hover:shadow-xl
+  transition-shadow"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;h2</span> <span class="at">class</span>=<span class="st">"text-xl font-bold
+    text-blue-700"</span><span class="tg">&gt;</span>
+    Mi tarjeta
+  <span class="tg">&lt;/h2&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+        </div>
+      </div>
+
+      <!-- SVG -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=600&q=80" alt="SVG" onerror="this.src='https://placehold.co/600x160/ffb13b/000000?text=SVG'"/>
+          <span class="lang-logo-badge badge-design">SVG</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">SVG</div>
+          <p class="lang-desc">Scalable Vector Graphics. Formato XML para gráficos vectoriales en la web. Logos, íconos e ilustraciones que no pierden calidad a ningún tamaño.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">icono.svg</span>
+          </div>
+          <pre><span class="cm">&lt;!-- SVG con gradiente animado --&gt;</span>
+<span class="tg">&lt;svg</span> <span class="at">viewBox</span>=<span class="st">"0 0 100 100"</span>
+  <span class="at">xmlns</span>=<span class="st">"http://www.w3.org/2000/svg"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;defs&gt;</span>
+    <span class="tg">&lt;linearGradient</span> <span class="at">id</span>=<span class="st">"g"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;stop</span> <span class="at">offset</span>=<span class="st">"0%"</span> <span class="at">stop-color</span>=<span class="st">"#2563eb"</span><span class="tg">/&gt;</span>
+      <span class="tg">&lt;stop</span> <span class="at">offset</span>=<span class="st">"100%"</span> <span class="at">stop-color</span>=<span class="st">"#60a5fa"</span><span class="tg">/&gt;</span>
+    <span class="tg">&lt;/linearGradient&gt;</span>
+  <span class="tg">&lt;/defs&gt;</span>
+  <span class="tg">&lt;circle</span> <span class="at">cx</span>=<span class="st">"50"</span> <span class="at">cy</span>=<span class="st">"50"</span> <span class="at">r</span>=<span class="st">"45"</span> <span class="at">fill</span>=<span class="st">"url(#g)"</span><span class="tg">/&gt;</span>
+<span class="tg">&lt;/svg&gt;</span></pre>
+        </div>
+      </div>
+
+      <!-- LaTeX -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600&q=80" alt="LaTeX" onerror="this.src='https://placehold.co/600x160/008080/ffffff?text=LaTeX'"/>
+          <span class="lang-logo-badge badge-design">LaTeX</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">LaTeX</div>
+          <p class="lang-desc">Sistema de maquetación profesional para documentos científicos, académicos y técnicos. Estándar en publicaciones universitarias y matemáticas.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">documento.tex</span>
+          </div>
+          <pre><span class="cm">% Documento con fórmula matemática</span>
+<span class="kw">\documentclass</span><span class="pn">{</span><span class="nm">article</span><span class="pn">}</span>
+<span class="kw">\usepackage</span><span class="pn">{</span><span class="nm">amsmath</span><span class="pn">}</span>
+<span class="kw">\begin</span><span class="pn">{</span><span class="nm">document</span><span class="pn">}</span>
+  <span class="kw">\title</span><span class="pn">{</span>Cultura Digital<span class="pn">}</span>
+  <span class="kw">\maketitle</span>
+  La fórmula de Euler:
+  <span class="pn">$</span> e^<span class="pn">{</span>i<span class="kw">\pi</span><span class="pn">}</span> + 1 = 0 <span class="pn">$</span>
+<span class="kw">\end</span><span class="pn">{</span><span class="nm">document</span><span class="pn">}</span></pre>
+        </div>
+      </div>
+
+      <!-- Markdown -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80" alt="Markdown" onerror="this.src='https://placehold.co/600x160/083fa1/ffffff?text=Markdown'"/>
+          <span class="lang-logo-badge badge-design">Markdown</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">Markdown</div>
+          <p class="lang-desc">Lenguaje de marcado ligero para escribir documentación, READMEs y blogs con formato usando solo texto plano. Base de GitHub, Notion y muchos más.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">README.md</span>
+          </div>
+          <pre><span class="tg"># Mi Proyecto</span>
+<span class="cm">_Descripción breve del proyecto_</span>
+
+<span class="tg">## Instalación</span>
+<span class="nm">1.</span> Clona el repositorio
+<span class="nm">2.</span> Ejecuta <span class="st">`npm install`</span>
+
+<span class="tg">## Características</span>
+<span class="kw">-</span> ✅ Rápido
+<span class="kw">-</span> ✅ Modular
+<span class="kw">-</span> ✅ Open Source
+
+<span class="pn">></span> <span class="at">**Nota:**</span> Requiere Node.js 18+</pre>
+        </div>
+      </div>
+
+      <!-- XML / JSON -->
+      <div class="lang-card">
+        <div class="lang-img-wrap">
+          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80" alt="JSON" onerror="this.src='https://placehold.co/600x160/333333/ffffff?text=JSON'"/>
+          <span class="lang-logo-badge badge-design">JSON / XML</span>
+        </div>
+        <div class="lang-body">
+          <div class="lang-name">JSON / XML</div>
+          <p class="lang-desc">Formatos de intercambio de datos. JSON es el estándar moderno para APIs. XML se usa en configuraciones, documentos y sistemas heredados.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang-label">datos.json</span>
+          </div>
+          <pre><span class="pn">{</span>
+  <span class="at">"alumno"</span>: <span class="pn">{</span>
+    <span class="at">"nombre"</span>: <span class="st">"Brandon Tadeo"</span>,
+    <span class="at">"especialidad"</span>: <span class="st">"IA"</span>,
+    <span class="at">"calificacion"</span>: <span class="nm">9.8</span>,
+    <span class="at">"activo"</span>: <span class="kw">true</span>,
+    <span class="at">"materias"</span>: [
+      <span class="st">"Cultura Digital"</span>,
+      <span class="st">"Programación"</span>
+    ]
+  <span class="pn">}</span>
+<span class="pn">}</span></pre>
+        </div>
+      </div>
+
+    </div><!-- /lang-grid design -->
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p><strong>Escuela:</strong> Centro de Bachillerato Tecnológico Industrial y de Servicios 144</p>
+    <p><strong>Especialidad:</strong> Inteligencia Artificial</p>
+    <p><strong>Profesor:</strong> Jordy Chirino Balcazar</p>
+  </footer>
+
+</body>
+</html>

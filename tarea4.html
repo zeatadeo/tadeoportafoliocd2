@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guía CSS3 desde Cero – Tarea 04</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-deep:   #0a1628;
+      --blue-mid:    #1a3a6e;
+      --blue-bright: #2563eb;
+      --blue-light:  #60a5fa;
+      --cream:       #f5f0e8;
+      --white:       #ffffff;
+      --black:       #111111;
+      --gray:        #555555;
+      --gray-light:  #e8e4dc;
+      /* CSS3 accent palette */
+      --css-pink:    #ec4899;
+      --css-violet:  #8b5cf6;
+      --css-teal:    #14b8a6;
+      --css-amber:   #f59e0b;
+      --css-sky:     #0ea5e9;
+      --code-bg:     #0d1117;
+      --code-text:   #e6edf3;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: #0f0f1a; color: var(--white); }
+
+    /* ── BACK BUTTON ── */
+    .back-btn {
+      position: fixed; top: 22px; left: 22px; z-index: 200;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 18px 9px 14px;
+      background: rgba(10,22,40,.85); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.18); border-radius: 50px;
+      color: var(--white); text-decoration: none;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      transition: background .2s, transform .2s;
+    }
+    .back-btn:hover { background: var(--css-pink); transform: translateX(-3px); }
+    .back-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ═══════════════════════════════════════════
+       HERO – Gradient mesh dark
+    ═══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 100px 24px 80px; text-align: center;
+    }
+    /* Mesh gradient background */
+    .hero-mesh {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(236,72,153,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(139,92,246,.2) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 50% 10%, rgba(14,165,233,.12) 0%, transparent 60%),
+        #0f0f1a;
+    }
+    /* Grid overlay */
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 1;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    /* Animated CSS property bubbles */
+    .bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .bub {
+      position: absolute; font-family: 'Fira Code', monospace;
+      font-size: .72rem; font-weight: 500;
+      padding: 4px 10px; border-radius: 20px;
+      animation: bubFloat linear infinite;
+      white-space: nowrap; opacity: 0;
+    }
+    .bub:nth-child(1)  { left:4%;  top:80%; animation-duration:16s; animation-delay:0s;   background:rgba(236,72,153,.15); color:rgba(236,72,153,.9); }
+    .bub:nth-child(2)  { left:12%; top:90%; animation-duration:20s; animation-delay:2s;   background:rgba(139,92,246,.15); color:rgba(139,92,246,.9); }
+    .bub:nth-child(3)  { left:25%; top:85%; animation-duration:14s; animation-delay:4s;   background:rgba(14,165,233,.15); color:rgba(14,165,233,.9); }
+    .bub:nth-child(4)  { left:40%; top:92%; animation-duration:18s; animation-delay:1s;   background:rgba(20,184,166,.15); color:rgba(20,184,166,.9); }
+    .bub:nth-child(5)  { left:55%; top:88%; animation-duration:22s; animation-delay:6s;   background:rgba(245,158,11,.15); color:rgba(245,158,11,.9); }
+    .bub:nth-child(6)  { left:68%; top:82%; animation-duration:15s; animation-delay:3s;   background:rgba(236,72,153,.15); color:rgba(236,72,153,.9); }
+    .bub:nth-child(7)  { left:80%; top:90%; animation-duration:19s; animation-delay:5s;   background:rgba(139,92,246,.15); color:rgba(139,92,246,.9); }
+    .bub:nth-child(8)  { left:90%; top:86%; animation-duration:13s; animation-delay:0.5s; background:rgba(14,165,233,.15); color:rgba(14,165,233,.9); }
+    @keyframes bubFloat {
+      0%   { transform:translateY(0); opacity:0; }
+      5%   { opacity:1; }
+      95%  { opacity:1; }
+      100% { transform:translateY(-110vh); opacity:0; }
+    }
+
+    .hero-inner { position: relative; z-index: 2; max-width: 800px; }
+    .hero-tag {
+      font-size: .68rem; letter-spacing: .4em; text-transform: uppercase;
+      color: var(--css-pink); font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .hero-tag::before, .hero-tag::after { content:''; width:28px; height:2px; background:var(--css-pink); }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 11vw, 10rem);
+      line-height: .88; margin-bottom: 10px;
+      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 40%, #0ea5e9 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-title .sub { font-size: .38em; display: block; color: rgba(255,255,255,.5); -webkit-text-fill-color: rgba(255,255,255,.5); letter-spacing: .2em; }
+
+    .hero-desc {
+      font-family: 'Lora', serif; font-style: italic;
+      font-size: clamp(.9rem, 1.8vw, 1.1rem);
+      color: rgba(255,255,255,.5); line-height: 1.7;
+      max-width: 560px; margin: 22px auto 36px;
+    }
+
+    /* Live CSS demo strip */
+    .demo-strip {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px;
+    }
+    .demo-box {
+      width: 54px; height: 54px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .55rem; font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; cursor: default;
+    }
+    .db1 { background: linear-gradient(135deg,#ec4899,#8b5cf6); box-shadow: 0 0 20px rgba(236,72,153,.4); }
+    .db2 { background: conic-gradient(#0ea5e9,#14b8a6,#0ea5e9); border-radius: 50%; }
+    .db3 { background: #0f0f1a; border: 2px solid #ec4899; box-shadow: inset 0 0 15px rgba(236,72,153,.2); }
+    .db4 { background: rgba(255,255,255,.06); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.15); }
+    .db5 { background: #8b5cf6; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+    .db6 { background: linear-gradient(45deg,#f59e0b,#ec4899,#8b5cf6,#0ea5e9); background-size: 300% 300%; animation: grad 3s ease infinite; }
+    @keyframes grad { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+    .hero-stats { display: flex; gap: 36px; justify-content: center; flex-wrap: wrap; }
+    .stat .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1; color: var(--white); }
+    .stat .stat-lbl { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.35); }
+
+    /* ── STICKY NAV ── */
+    .sticky-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,15,26,.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      display: flex; justify-content: center; overflow-x: auto; scrollbar-width: none;
+    }
+    .sticky-nav::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      padding: 14px 18px; font-size: .67rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,.35); text-decoration: none;
+      border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap;
+    }
+    .nav-tab:hover { color: var(--css-pink); border-color: var(--css-pink); }
+
+    /* ── PAGE ── */
+    .page { max-width: 1000px; margin: 0 auto; padding: 60px 24px 80px; }
+
+    /* ── CHAPTER ── */
+    .chapter {
+      display: flex; align-items: center; gap: 20px;
+      margin: 72px 0 38px; padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .ch-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 4rem;
+      line-height: 1; min-width: 72px; text-align: right;
+      background: linear-gradient(135deg, var(--css-pink), var(--css-violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: .35;
+    }
+    .ch-label { font-size: .64rem; letter-spacing: .3em; text-transform: uppercase; font-weight: 700; color: var(--css-pink); margin-bottom: 4px; }
+    .ch-text h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .04em; color: var(--white); line-height: 1; }
+    .ch-text p  { font-size: .82rem; color: rgba(255,255,255,.4); margin-top: 5px; line-height: 1.5; }
+
+    /* ── PROSE ── */
+    .prose p { font-family: 'Lora', serif; font-size: 1rem; line-height: 1.85; color: rgba(255,255,255,.7); margin-bottom: 18px; }
+    .prose p strong { color: var(--css-pink); font-weight: 700; }
+    .prose p em { color: var(--css-teal); font-style: normal; font-weight: 600; }
+
+    /* ── INFO BOXES ── */
+    .info-box {
+      display: flex; gap: 14px; align-items: flex-start;
+      border-radius: 12px; padding: 16px 20px; margin: 22px 0;
+      border: 1px solid;
+    }
+    .info-box .ib-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+    .info-box p { font-size: .84rem; line-height: 1.6; margin: 0; font-family: 'Montserrat', sans-serif; color: rgba(255,255,255,.65); }
+    .info-box p strong { color: var(--white); }
+    .tip  { background: rgba(20,184,166,.08);  border-color: rgba(20,184,166,.3); }
+    .warn { background: rgba(245,158,11,.08);  border-color: rgba(245,158,11,.3); }
+    .note { background: rgba(139,92,246,.08);  border-color: rgba(139,92,246,.3); }
+
+    /* ── CODE BLOCK ── */
+    .code-wrap {
+      margin: 26px 0; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .code-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 18px; background: rgba(255,255,255,.04);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .code-dots { display: flex; gap: 5px; }
+    .code-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-r{background:#ff5f57} .dot-y{background:#febc2e} .dot-g{background:#28c840}
+    .code-fname { font-family:'Fira Code',monospace; font-size:.67rem; color:rgba(255,255,255,.3); }
+    .code-wrap pre {
+      font-family: 'Fira Code', monospace; font-size: .79rem;
+      line-height: 1.78; color: var(--code-text);
+      padding: 22px 24px; overflow-x: auto; white-space: pre;
+      background: var(--code-bg);
+    }
+    /* Syntax */
+    .kw{color:#ff7b72} .fn{color:#d2a8ff} .st{color:#a5d6ff}
+    .cm{color:#8b949e;font-style:italic} .nm{color:#79c0ff}
+    .tg{color:#7ee787} .at{color:#ffa657} .vl{color:#a5d6ff}
+    .pn{color:#e6edf3} .un{color:#f97316}
+
+    /* ── PROPERTY CARDS ── */
+    .prop-grid {
+      display: grid; gap: 14px; margin: 28px 0;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .prop-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 18px 20px;
+      transition: transform .2s, border-color .2s, background .2s;
+    }
+    .prop-card:hover { transform: translateY(-3px); background: rgba(255,255,255,.07); }
+    .prop-card.pink   { border-left: 4px solid var(--css-pink); }
+    .prop-card.violet { border-left: 4px solid var(--css-violet); }
+    .prop-card.teal   { border-left: 4px solid var(--css-teal); }
+    .prop-card.amber  { border-left: 4px solid var(--css-amber); }
+    .prop-card.sky    { border-left: 4px solid var(--css-sky); }
+    .prop-card.green  { border-left: 4px solid #22c55e; }
+
+    .prop-name { font-family:'Fira Code',monospace; font-size:.88rem; font-weight:500; margin-bottom:6px; }
+    .prop-card.pink   .prop-name { color: var(--css-pink); }
+    .prop-card.violet .prop-name { color: var(--css-violet); }
+    .prop-card.teal   .prop-name { color: var(--css-teal); }
+    .prop-card.amber  .prop-name { color: var(--css-amber); }
+    .prop-card.sky    .prop-name { color: var(--css-sky); }
+    .prop-card.green  .prop-name { color: #22c55e; }
+    .prop-desc { font-size: .78rem; color: rgba(255,255,255,.5); line-height: 1.55; }
+    .prop-val  { font-family:'Fira Code',monospace; font-size:.72rem; color:rgba(255,255,255,.3); margin-top:6px; }
+
+    /* ── VISUAL DEMO BOXES ── */
+    .visual-demos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; margin: 28px 0; }
+    .v-demo {
+      border-radius: 12px; padding: 20px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+    }
+    .v-demo-title { font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+    .v-demo-box   { width: 70px; height: 70px; border-radius: 10px; }
+
+    /* Box model visual */
+    .box-model-wrap { margin: 28px 0; }
+    .bm {
+      border-radius: 12px; padding: 12px; text-align: center;
+      font-family: 'Fira Code', monospace; font-size: .72rem; font-weight: 500;
+    }
+    .bm-margin  { background: rgba(245,158,11,.12); border: 2px dashed rgba(245,158,11,.4); color: var(--css-amber); padding: 16px; }
+    .bm-border  { background: rgba(139,92,246,.12); border: 2px solid rgba(139,92,246,.5); color: var(--css-violet); padding: 16px; margin: 8px; }
+    .bm-padding { background: rgba(14,165,233,.12); border: 2px dashed rgba(14,165,233,.4); color: var(--css-sky); padding: 16px; margin: 8px; }
+    .bm-content { background: rgba(236,72,153,.15); border: 2px solid rgba(236,72,153,.5); color: var(--css-pink); padding: 20px 30px; margin: 8px; }
+    .bm-label   { font-size: .65rem; opacity: .7; display: block; margin-bottom: 4px; }
+
+    /* Flexbox diagram */
+    .flex-demo { background: rgba(255,255,255,.04); border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid rgba(255,255,255,.08); }
+    .flex-demo-title { font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; }
+    .flex-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+    .flex-item { background: rgba(236,72,153,.2); border: 1px solid rgba(236,72,153,.4); border-radius: 8px; padding: 12px 18px; font-family: 'Fira Code', monospace; font-size: .75rem; color: var(--css-pink); }
+    .flex-item.grow { flex: 1; background: rgba(139,92,246,.2); border-color: rgba(139,92,246,.4); color: var(--css-violet); }
+    .flex-item.center { margin: 0 auto; background: rgba(14,165,233,.2); border-color: rgba(14,165,233,.4); color: var(--css-sky); }
+
+    /* Grid diagram */
+    .grid-demo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+    .g-item { background: rgba(20,184,166,.15); border: 1px solid rgba(20,184,166,.35); border-radius: 8px; padding: 14px; text-align: center; font-family: 'Fira Code', monospace; font-size: .75rem; color: var(--css-teal); }
+    .g-item.span2 { grid-column: span 2; background: rgba(20,184,166,.22); }
+    .g-item.span3 { grid-column: span 3; background: rgba(20,184,166,.28); }
+
+    /* Specificity pyramid */
+    .pyramid { margin: 28px auto; max-width: 480px; }
+    .pyr-row { border-radius: 8px; text-align: center; padding: 12px; margin-bottom: 6px; font-size: .82rem; font-weight: 600; }
+    .pyr-1 { background: rgba(239,68,68,.2); border: 1px solid rgba(239,68,68,.4); color: #f87171; width: 30%; margin: 0 auto 6px; }
+    .pyr-2 { background: rgba(245,158,11,.2); border: 1px solid rgba(245,158,11,.4); color: var(--css-amber); width: 52%; margin: 0 auto 6px; }
+    .pyr-3 { background: rgba(34,197,94,.2); border: 1px solid rgba(34,197,94,.4); color: #4ade80; width: 72%; margin: 0 auto 6px; }
+    .pyr-4 { background: rgba(14,165,233,.2); border: 1px solid rgba(14,165,233,.4); color: var(--css-sky); width: 88%; margin: 0 auto 6px; }
+    .pyr-5 { background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.4); color: var(--css-violet); width: 100%; margin: 0 auto; }
+    .pyr-label { font-size: .65rem; opacity: .6; font-weight: 400; display: block; }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      border-left: 4px solid var(--css-violet); margin: 36px 0;
+      padding: 16px 28px; background: rgba(139,92,246,.06); border-radius: 0 10px 10px 0;
+    }
+    .pull-quote p { font-family:'Lora',serif; font-size:1.1rem; font-style:italic; color:rgba(255,255,255,.7); margin:0; line-height:1.7; }
+    .pull-quote cite { display:block; margin-top:8px; font-size:.75rem; font-style:normal; font-family:'Montserrat',sans-serif; color:rgba(255,255,255,.35); letter-spacing:.08em; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 16px 0; }
+
+    /* ── CONTENT SECTION BG alternation ── */
+    .section-light {
+      background: rgba(255,255,255,.02);
+      border-radius: 20px; padding: 32px; margin: 0 -8px 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #070710; color: rgba(255,255,255,.4);
+      text-align: center; padding: 32px 20px;
+      font-size: .8rem; letter-spacing: .08em; line-height: 2;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+    footer strong { color: var(--css-pink); font-weight: 700; }
+
+    @media(max-width:640px) {
+      .prop-grid { grid-template-columns: 1fr 1fr; }
+      .hero-title { font-size: 4rem; }
+      .pyr-1,.pyr-2,.pyr-3,.pyr-4,.pyr-5 { width:100% !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-btn">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Regresar
+  </a>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-grid"></div>
+    <div class="bubbles">
+      <span class="bub">color: #ec4899</span>
+      <span class="bub">display: flex</span>
+      <span class="bub">border-radius: 50%</span>
+      <span class="bub">grid-template-columns: repeat(3,1fr)</span>
+      <span class="bub">animation: fadeIn 1s ease</span>
+      <span class="bub">box-shadow: 0 8px 32px</span>
+      <span class="bub">transform: translateY(-4px)</span>
+      <span class="bub">backdrop-filter: blur(10px)</span>
+    </div>
+    <div class="hero-inner">
+      <p class="hero-tag">Tarea 04 &nbsp;·&nbsp; Cultura Digital 2</p>
+      <h1 class="hero-title">
+        CSS<span style="-webkit-text-fill-color:var(--css-pink);color:var(--css-pink);">3</span>
+        <span class="sub">Desde Cero · Guía Completa</span>
+      </h1>
+      <p class="hero-desc">Aprende a dar vida, color, forma y movimiento a tus páginas web. De los selectores básicos hasta animaciones y layouts modernos.</p>
+      <div class="demo-strip">
+        <div class="demo-box db1"></div>
+        <div class="demo-box db2"></div>
+        <div class="demo-box db3"></div>
+        <div class="demo-box db4"></div>
+        <div class="demo-box db5"></div>
+        <div class="demo-box db6"></div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">9</span><span class="stat-lbl">Capítulos</span></div>
+        <div class="stat"><span class="stat-num">80+</span><span class="stat-lbl">Propiedades</span></div>
+        <div class="stat"><span class="stat-num">40+</span><span class="stat-lbl">Ejemplos</span></div>
+        <div class="stat"><span class="stat-num">1994</span><span class="stat-lbl">Desde</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ NAV ══ -->
+  <nav class="sticky-nav">
+    <a href="#intro"      class="nav-tab">Intro</a>
+    <a href="#sintaxis"   class="nav-tab">Sintaxis</a>
+    <a href="#selectores" class="nav-tab">Selectores</a>
+    <a href="#boxmodel"   class="nav-tab">Box Model</a>
+    <a href="#colores"    class="nav-tab">Colores</a>
+    <a href="#tipografia" class="nav-tab">Tipografía</a>
+    <a href="#flexbox"    class="nav-tab">Flexbox</a>
+    <a href="#grid"       class="nav-tab">Grid</a>
+    <a href="#animaciones" class="nav-tab">Animaciones</a>
+  </nav>
+
+  <main class="page">
+
+    <!-- ═══════════ CAP 1 – INTRO ═══════════ -->
+    <div id="intro">
+      <div class="chapter">
+        <div class="ch-num">01</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 01</div>
+          <h2>¿Qué es CSS3?</h2>
+          <p>El lenguaje del diseño y la presentación web</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p><strong>CSS</strong> (Cascading Style Sheets — Hojas de Estilo en Cascada) es el lenguaje que controla la <em>apariencia visual</em> de las páginas web. Mientras HTML define qué hay en la página, CSS define cómo se ve: colores, tamaños, posiciones, fuentes y animaciones.</p>
+        <p><strong>CSS3</strong> es la versión actual, que incorporó módulos independientes como Flexbox, Grid, animaciones, transformaciones, variables personalizadas y soporte avanzado para tipografía y colores.</p>
+      </div>
+      <div class="info-box tip">
+        <div class="ib-icon">💡</div>
+        <p><strong>Analogía:</strong> Si HTML es el esqueleto de una persona, CSS es la ropa, el maquillaje, el color de cabello y el estilo. Puedes cambiar completamente la apariencia sin tocar la estructura interior.</p>
+      </div>
+      <div class="prop-grid">
+        <div class="prop-card pink">
+          <div class="prop-name">🎨 Presentación</div>
+          <div class="prop-desc">Controla colores, fondos, bordes, sombras y todo lo visual de cada elemento HTML.</div>
+        </div>
+        <div class="prop-card violet">
+          <div class="prop-name">📐 Diseño</div>
+          <div class="prop-desc">Define cómo se organizan los elementos en la página: columnas, filas, posicionamiento.</div>
+        </div>
+        <div class="prop-card teal">
+          <div class="prop-name">📱 Responsivo</div>
+          <div class="prop-desc">Adapta el diseño a diferentes tamaños de pantalla con Media Queries.</div>
+        </div>
+        <div class="prop-card amber">
+          <div class="prop-name">✨ Animaciones</div>
+          <div class="prop-desc">Crea transiciones suaves, animaciones y transformaciones sin JavaScript.</div>
+        </div>
+      </div>
+
+      <!-- Cómo se vincula CSS -->
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">3 formas de usar CSS</span>
+        </div>
+        <pre><span class="cm">/* ─── 1. CSS EXTERNO (recomendado) ─── */</span>
+<span class="cm">/* En el &lt;head&gt; del HTML: */</span>
+<span class="tg">&lt;link</span> <span class="at">rel</span>=<span class="st">"stylesheet"</span> <span class="at">href</span>=<span class="st">"estilos.css"</span><span class="tg">/&gt;</span>
+
+<span class="cm">/* ─── 2. CSS INTERNO (dentro del HTML) ─── */</span>
+<span class="tg">&lt;style&gt;</span>
+  <span class="tg">body</span> <span class="pn">{</span> <span class="at">background</span>: <span class="vl">#0f0f1a</span>; <span class="pn">}</span>
+<span class="tg">&lt;/style&gt;</span>
+
+<span class="cm">/* ─── 3. CSS EN LÍNEA (evitar para mantenimiento) ─── */</span>
+<span class="tg">&lt;p</span> <span class="at">style</span>=<span class="st">"color: pink; font-size: 1.2rem;"</span><span class="tg">&gt;</span>Texto<span class="tg">&lt;/p&gt;</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 2 – SINTAXIS ═══════════ -->
+    <div id="sintaxis">
+      <div class="chapter">
+        <div class="ch-num">02</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 02</div>
+          <h2>Sintaxis y Variables</h2>
+          <p>La anatomía de una regla CSS</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Una <strong>regla CSS</strong> tiene dos partes: el <em>selector</em> (qué elementos afecta) y el <em>bloque de declaraciones</em> (cómo deben verse). Cada declaración tiene una propiedad y un valor separados por dos puntos.</p>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">sintaxis.css</span>
+        </div>
+        <pre><span class="cm">/* ── ANATOMÍA DE UNA REGLA ── */</span>
+<span class="cm">/*  selector  { propiedad: valor; }  */</span>
+
+<span class="tg">h1</span> <span class="pn">{</span>
+  <span class="at">color</span>: <span class="vl">#ec4899</span>;          <span class="cm">/* propiedad: valor */</span>
+  <span class="at">font-size</span>: <span class="vl">3rem</span>;
+  <span class="at">text-align</span>: <span class="vl">center</span>;
+<span class="pn">}</span>
+
+<span class="cm">/* ── VARIABLES CSS PERSONALIZADAS (Custom Properties) ── */</span>
+<span class="tg">:root</span> <span class="pn">{</span>
+  <span class="at">--color-primario</span>:    <span class="vl">#ec4899</span>;
+  <span class="at">--color-secundario</span>: <span class="vl">#8b5cf6</span>;
+  <span class="at">--fuente-principal</span>: <span class="st">'Montserrat'</span>, sans-serif;
+  <span class="at">--radio-borde</span>:       <span class="vl">12px</span>;
+  <span class="at">--sombra</span>:            <span class="vl">0 4px 20px rgba(0,0,0,.3)</span>;
+<span class="pn">}</span>
+
+<span class="cm">/* ── USO DE VARIABLES ── */</span>
+<span class="tg">.tarjeta</span> <span class="pn">{</span>
+  <span class="at">background</span>:    <span class="fn">var</span>(<span class="at">--color-primario</span>);
+  <span class="at">border-radius</span>: <span class="fn">var</span>(<span class="at">--radio-borde</span>);
+  <span class="at">box-shadow</span>:    <span class="fn">var</span>(<span class="at">--sombra</span>);
+  <span class="at">font-family</span>:   <span class="fn">var</span>(<span class="at">--fuente-principal</span>);
+<span class="pn">}</span>
+
+<span class="cm">/* ── COMENTARIOS CSS ── */</span>
+<span class="cm">/* Este es un comentario de una línea */</span>
+<span class="cm">/*
+  Este es un comentario
+  de varias líneas
+*/</span>
+
+<span class="cm">/* ── UNIDADES DE MEDIDA ── */</span>
+<span class="tg">.ejemplo</span> <span class="pn">{</span>
+  <span class="at">width</span>:      <span class="vl">300px</span>;    <span class="cm">/* píxeles — absoluto */</span>
+  <span class="at">font-size</span>:  <span class="vl">1.5rem</span>;  <span class="cm">/* relativo al root (16px) */</span>
+  <span class="at">padding</span>:    <span class="vl">2em</span>;     <span class="cm">/* relativo al font-size del elemento */</span>
+  <span class="at">height</span>:     <span class="vl">50vh</span>;    <span class="cm">/* 50% del alto de la ventana */</span>
+  <span class="at">max-width</span>:  <span class="vl">80%</span>;     <span class="cm">/* porcentaje del contenedor padre */</span>
+  <span class="at">gap</span>:        <span class="vl">clamp(1rem, 3vw, 2rem)</span>; <span class="cm">/* mín, ideal, máx */</span>
+<span class="pn">}</span></pre>
+      </div>
+
+      <div class="prop-grid">
+        <div class="prop-card pink"><div class="prop-name">px</div><div class="prop-desc">Píxeles. Unidad absoluta. 1px = 1 punto en pantalla.</div><div class="prop-val">font-size: 16px</div></div>
+        <div class="prop-card violet"><div class="prop-name">rem</div><div class="prop-desc">Relativo al font-size de :root (normalmente 16px). El más recomendado.</div><div class="prop-val">font-size: 1.5rem → 24px</div></div>
+        <div class="prop-card teal"><div class="prop-name">em</div><div class="prop-desc">Relativo al font-size del elemento padre. Se acumula en anidamiento.</div><div class="prop-val">padding: 2em</div></div>
+        <div class="prop-card amber"><div class="prop-name">vh / vw</div><div class="prop-desc">Viewport Height / Width. 100vh = toda la pantalla de alto.</div><div class="prop-val">height: 100vh</div></div>
+        <div class="prop-card sky"><div class="prop-name">%</div><div class="prop-desc">Porcentaje del elemento padre. width: 50% = mitad del contenedor.</div><div class="prop-val">width: 50%</div></div>
+        <div class="prop-card green"><div class="prop-name">clamp()</div><div class="prop-desc">Valor fluido entre un mínimo y máximo. Ideal para tipografía responsiva.</div><div class="prop-val">font-size: clamp(1rem, 4vw, 3rem)</div></div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 3 – SELECTORES ═══════════ -->
+    <div id="selectores">
+      <div class="chapter">
+        <div class="ch-num">03</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 03</div>
+          <h2>Selectores y Especificidad</h2>
+          <p>Apuntar exactamente al elemento correcto</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Los <strong>selectores</strong> son patrones que indican a CSS qué elementos HTML deben ser estilizados. CSS3 ofrece una enorme variedad de selectores para apuntar con precisión quirúrgica a cualquier elemento.</p>
+        <p>Cuando dos reglas aplican al mismo elemento, la <em>especificidad</em> determina cuál gana. Una regla más específica siempre supera a una menos específica.</p>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">selectores.css</span>
+        </div>
+        <pre><span class="cm">/* ── SELECTORES BÁSICOS ── */</span>
+<span class="tg">*</span>          <span class="pn">{</span> <span class="at">box-sizing</span>: <span class="vl">border-box</span>; <span class="pn">}</span>  <span class="cm">/* universal */</span>
+<span class="tg">p</span>          <span class="pn">{</span> <span class="at">color</span>: <span class="vl">white</span>; <span class="pn">}</span>             <span class="cm">/* etiqueta */</span>
+<span class="tg">.clase</span>     <span class="pn">{</span> <span class="at">font-weight</span>: <span class="vl">700</span>; <span class="pn">}</span>        <span class="cm">/* clase */</span>
+<span class="tg">#id</span>        <span class="pn">{</span> <span class="at">font-size</span>: <span class="vl">2rem</span>; <span class="pn">}</span>         <span class="cm">/* id (único) */</span>
+
+<span class="cm">/* ── SELECTORES COMBINADOS ── */</span>
+<span class="tg">nav a</span>      <span class="pn">{</span> <span class="at">color</span>: <span class="vl">#60a5fa</span>; <span class="pn">}</span>   <span class="cm">/* descendiente */</span>
+<span class="tg">nav &gt; a</span>    <span class="pn">{</span> <span class="at">font-weight</span>: <span class="vl">bold</span>; <span class="pn">}</span> <span class="cm">/* hijo directo */</span>
+<span class="tg">h2 + p</span>     <span class="pn">{</span> <span class="at">margin-top</span>: <span class="vl">0</span>; <span class="pn">}</span>    <span class="cm">/* hermano adyacente */</span>
+<span class="tg">h2 ~ p</span>     <span class="pn">{</span> <span class="at">color</span>: <span class="vl">gray</span>; <span class="pn">}</span>      <span class="cm">/* todos los hermanos siguientes */</span>
+<span class="tg">h1, h2, h3</span> <span class="pn">{</span> <span class="at">font-family</span>: <span class="vl">serif</span>; <span class="pn">}</span> <span class="cm">/* grupo */</span>
+
+<span class="cm">/* ── PSEUDO-CLASES (estado del elemento) ── */</span>
+<span class="tg">a:hover</span>              <span class="pn">{</span> <span class="at">color</span>: <span class="vl">#ec4899</span>; <span class="pn">}</span>
+<span class="tg">button:focus</span>         <span class="pn">{</span> <span class="at">outline</span>: <span class="vl">2px solid #8b5cf6</span>; <span class="pn">}</span>
+<span class="tg">input:disabled</span>       <span class="pn">{</span> <span class="at">opacity</span>: <span class="vl">.4</span>; <span class="pn">}</span>
+<span class="tg">li:first-child</span>       <span class="pn">{</span> <span class="at">font-weight</span>: <span class="vl">bold</span>; <span class="pn">}</span>
+<span class="tg">li:last-child</span>        <span class="pn">{</span> <span class="at">border-bottom</span>: <span class="vl">none</span>; <span class="pn">}</span>
+<span class="tg">li:nth-child(2n)</span>     <span class="pn">{</span> <span class="at">background</span>: <span class="vl">rgba(255,255,255,.05)</span>; <span class="pn">}</span>
+<span class="tg">p:not(.especial)</span>     <span class="pn">{</span> <span class="at">font-size</span>: <span class="vl">.9rem</span>; <span class="pn">}</span>
+
+<span class="cm">/* ── PSEUDO-ELEMENTOS (partes del elemento) ── */</span>
+<span class="tg">p::first-line</span>   <span class="pn">{</span> <span class="at">font-variant</span>: <span class="vl">small-caps</span>; <span class="pn">}</span>
+<span class="tg">p::first-letter</span> <span class="pn">{</span> <span class="at">font-size</span>: <span class="vl">3em</span>; <span class="at">float</span>: <span class="vl">left</span>; <span class="pn">}</span>
+<span class="tg">.btn::before</span>    <span class="pn">{</span> <span class="at">content</span>: <span class="st">'→ '</span>; <span class="pn">}</span>
+<span class="tg">.btn::after</span>     <span class="pn">{</span> <span class="at">content</span>: <span class="st">''</span>; <span class="at">display</span>: <span class="vl">block</span>; <span class="pn">}</span>
+
+<span class="cm">/* ── SELECTORES DE ATRIBUTO ── */</span>
+<span class="tg">input[type="email"]</span>    <span class="pn">{</span> <span class="at">border-color</span>: <span class="vl">#0ea5e9</span>; <span class="pn">}</span>
+<span class="tg">a[href^="https"]</span>       <span class="pn">{</span> <span class="at">color</span>: <span class="vl">#22c55e</span>; <span class="pn">}</span>  <span class="cm">/* empieza con */</span>
+<span class="tg">a[href$=".pdf"]</span>        <span class="pn">{</span> <span class="at">color</span>: <span class="vl">#f59e0b</span>; <span class="pn">}</span>  <span class="cm">/* termina con */</span>
+<span class="tg">a[href*="google"]</span>      <span class="pn">{</span> <span class="at">font-style</span>: <span class="vl">italic</span>; <span class="pn">}</span> <span class="cm">/* contiene */</span></pre>
+      </div>
+
+      <!-- Specificity pyramid -->
+      <div class="prose"><p>La <strong>especificidad</strong> determina qué regla "gana" cuando varias apuntan al mismo elemento. Funciona como un sistema de puntos:</p></div>
+      <div class="pyramid">
+        <div class="pyr-1">!important <span class="pyr-label">Fuerza máxima — evitar su uso</span></div>
+        <div class="pyr-2">id → #elemento <span class="pyr-label">100 puntos</span></div>
+        <div class="pyr-3">.clase :pseudo-clase [atributo] <span class="pyr-label">10 puntos</span></div>
+        <div class="pyr-4">etiqueta ::pseudo-elemento <span class="pyr-label">1 punto</span></div>
+        <div class="pyr-5">* universal / herencia <span class="pyr-label">0 puntos</span></div>
+      </div>
+
+      <div class="info-box warn">
+        <div class="ib-icon">⚠️</div>
+        <p><strong>!important</strong> anula toda la cascada y dificulta el mantenimiento del código. Úsalo solo como último recurso cuando no puedas aumentar la especificidad de otra forma.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 4 – BOX MODEL ═══════════ -->
+    <div id="boxmodel">
+      <div class="chapter">
+        <div class="ch-num">04</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 04</div>
+          <h2>El Box Model</h2>
+          <p>Cómo CSS calcula el espacio de cada elemento</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Cada elemento HTML es una <strong>caja rectangular</strong>. El Box Model describe las capas de esa caja: contenido, relleno (padding), borde (border) y margen (margin). Entender esto es esencial para controlar el layout.</p>
+      </div>
+
+      <div class="box-model-wrap">
+        <div class="bm bm-margin">
+          <span class="bm-label">MARGIN — Espacio exterior (transparente)</span>
+          <div class="bm bm-border">
+            <span class="bm-label">BORDER — Borde visible del elemento</span>
+            <div class="bm bm-padding">
+              <span class="bm-label">PADDING — Espacio interior</span>
+              <div class="bm bm-content">CONTENT — Texto / Imágenes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">box-model.css</span>
+        </div>
+        <pre><span class="cm">/* ── PROPIEDADES DEL BOX MODEL ── */</span>
+<span class="tg">.caja</span> <span class="pn">{</span>
+  <span class="cm">/* CONTENIDO */</span>
+  <span class="at">width</span>:  <span class="vl">300px</span>;
+  <span class="at">height</span>: <span class="vl">200px</span>;
+
+  <span class="cm">/* PADDING (relleno interior) */</span>
+  <span class="at">padding</span>: <span class="vl">20px</span>;              <span class="cm">/* todos lados */</span>
+  <span class="at">padding</span>: <span class="vl">10px 20px</span>;        <span class="cm">/* vertical | horizontal */</span>
+  <span class="at">padding</span>: <span class="vl">10px 20px 15px 5px</span>; <span class="cm">/* top right bottom left */</span>
+
+  <span class="cm">/* BORDER */</span>
+  <span class="at">border</span>:        <span class="vl">2px solid #ec4899</span>;
+  <span class="at">border-radius</span>: <span class="vl">12px</span>;  <span class="cm">/* esquinas redondeadas */</span>
+  <span class="at">border-top</span>:    <span class="vl">4px solid #8b5cf6</span>; <span class="cm">/* lado específico */</span>
+
+  <span class="cm">/* MARGIN (espacio exterior) */</span>
+  <span class="at">margin</span>: <span class="vl">20px auto</span>;  <span class="cm">/* centrado horizontal */</span>
+  <span class="at">margin-top</span>: <span class="vl">40px</span>;
+
+  <span class="cm">/* ¡MUY IMPORTANTE! box-sizing */</span>
+  <span class="at">box-sizing</span>: <span class="vl">border-box</span>;
+  <span class="cm">/* Con border-box: width INCLUYE padding y border */</span>
+  <span class="cm">/* Sin él: width SOLO es el contenido (confuso) */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Aplicar border-box a todo (buena práctica global) */</span>
+<span class="tg">*</span> <span class="pn">{</span> <span class="at">box-sizing</span>: <span class="vl">border-box</span>; <span class="pn">}</span>
+
+<span class="cm">/* ── DISPLAY ── */</span>
+<span class="tg">.bloque</span>   <span class="pn">{</span> <span class="at">display</span>: <span class="vl">block</span>; <span class="pn">}</span>    <span class="cm">/* ocupa toda la línea */</span>
+<span class="tg">.en-linea</span> <span class="pn">{</span> <span class="at">display</span>: <span class="vl">inline</span>; <span class="pn">}</span>   <span class="cm">/* fluye con el texto */</span>
+<span class="tg">.mixto</span>    <span class="pn">{</span> <span class="at">display</span>: <span class="vl">inline-block</span>; <span class="pn">}</span> <span class="cm">/* en línea con dimensiones */</span>
+<span class="tg">.oculto</span>   <span class="pn">{</span> <span class="at">display</span>: <span class="vl">none</span>; <span class="pn">}</span>     <span class="cm">/* desaparece del flujo */</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 5 – COLORES ═══════════ -->
+    <div id="colores">
+      <div class="chapter">
+        <div class="ch-num">05</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 05</div>
+          <h2>Colores, Fondos y Sombras</h2>
+          <p>El universo visual de CSS3</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>CSS3 ofrece múltiples formas de expresar colores y una potente colección de propiedades para fondos y sombras. Los <em>gradientes</em> y el sistema <strong>HSL</strong> son herramientas particularmente útiles para diseño profesional.</p>
+      </div>
+
+      <div class="visual-demos">
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:#ec4899;"></div>
+          <div class="v-demo-title">HEX</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:rgb(139,92,246);"></div>
+          <div class="v-demo-title">RGB</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:hsl(199,89%,48%);"></div>
+          <div class="v-demo-title">HSL</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:rgba(20,184,166,.5);"></div>
+          <div class="v-demo-title">RGBA</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);"></div>
+          <div class="v-demo-title">GRADIENTE LINEAL</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:radial-gradient(circle,#f59e0b,#ec4899);border-radius:50%;"></div>
+          <div class="v-demo-title">GRADIENTE RADIAL</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:conic-gradient(#ec4899,#8b5cf6,#0ea5e9,#ec4899);border-radius:50%;"></div>
+          <div class="v-demo-title">GRADIENTE CÓNICO</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:#1a1a2e;box-shadow:0 0 20px #ec4899,inset 0 0 10px rgba(236,72,153,.2);"></div>
+          <div class="v-demo-title">BOX-SHADOW</div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">colores-fondos.css</span>
+        </div>
+        <pre><span class="cm">/* ── FORMATOS DE COLOR ── */</span>
+<span class="tg">.colores</span> <span class="pn">{</span>
+  <span class="at">color</span>: <span class="vl">#ec4899</span>;              <span class="cm">/* hexadecimal */</span>
+  <span class="at">color</span>: <span class="fn">rgb</span>(<span class="nm">236</span>, <span class="nm">72</span>, <span class="nm">153</span>);     <span class="cm">/* rojo, verde, azul (0-255) */</span>
+  <span class="at">color</span>: <span class="fn">rgba</span>(<span class="nm">236</span>,<span class="nm">72</span>,<span class="nm">153</span>,<span class="nm">.5</span>);  <span class="cm">/* + opacidad (0-1) */</span>
+  <span class="at">color</span>: <span class="fn">hsl</span>(<span class="nm">328</span>, <span class="nm">81%</span>, <span class="nm">60%</span>);   <span class="cm">/* tono, saturación, luminosidad */</span>
+  <span class="at">color</span>: <span class="fn">hsla</span>(<span class="nm">328</span>,<span class="nm">81%</span>,<span class="nm">60%</span>,<span class="nm">.8</span>);<span class="cm">/* + opacidad */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── GRADIENTES ── */</span>
+<span class="tg">.grad-lineal</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="fn">linear-gradient</span>(<span class="nm">135deg</span>, <span class="vl">#ec4899</span>, <span class="vl">#8b5cf6</span>, <span class="vl">#0ea5e9</span>);
+<span class="pn">}</span>
+<span class="tg">.grad-radial</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="fn">radial-gradient</span>(circle at center, <span class="vl">#f59e0b 0%</span>, <span class="vl">#ec4899 100%</span>);
+<span class="pn">}</span>
+<span class="tg">.grad-animado</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="fn">linear-gradient</span>(<span class="nm">270deg</span>, <span class="vl">#ec4899</span>, <span class="vl">#8b5cf6</span>, <span class="vl">#0ea5e9</span>);
+  <span class="at">background-size</span>: <span class="vl">400% 400%</span>;
+  <span class="at">animation</span>: <span class="vl">gradMove 4s ease infinite</span>;
+<span class="pn">}</span>
+
+<span class="cm">/* ── SOMBRAS ── */</span>
+<span class="tg">.sombra-caja</span>   <span class="pn">{</span> <span class="at">box-shadow</span>: <span class="vl">0 4px 20px rgba(0,0,0,.3)</span>; <span class="pn">}</span>
+<span class="tg">.sombra-neon</span>   <span class="pn">{</span> <span class="at">box-shadow</span>: <span class="vl">0 0 20px #ec4899, 0 0 60px rgba(236,72,153,.3)</span>; <span class="pn">}</span>
+<span class="tg">.sombra-interna</span><span class="pn">{</span> <span class="at">box-shadow</span>: <span class="vl">inset 0 0 15px rgba(0,0,0,.5)</span>; <span class="pn">}</span>
+<span class="tg">.sombra-texto</span>  <span class="pn">{</span> <span class="at">text-shadow</span>: <span class="vl">0 2px 10px rgba(236,72,153,.6)</span>; <span class="pn">}</span>
+
+<span class="cm">/* ── FONDO CON IMAGEN ── */</span>
+<span class="tg">.hero</span> <span class="pn">{</span>
+  <span class="at">background-image</span>:    <span class="fn">url</span>(<span class="st">'imagen.jpg'</span>);
+  <span class="at">background-size</span>:     <span class="vl">cover</span>;      <span class="cm">/* cubre todo el elemento */</span>
+  <span class="at">background-position</span>: <span class="vl">center</span>;
+  <span class="at">background-repeat</span>:   <span class="vl">no-repeat</span>;
+  <span class="at">background-attachment</span>:<span class="vl">fixed</span>;     <span class="cm">/* efecto parallax */</span>
+<span class="pn">}</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 6 – TIPOGRAFÍA ═══════════ -->
+    <div id="tipografia">
+      <div class="chapter">
+        <div class="ch-num">06</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 06</div>
+          <h2>Tipografía</h2>
+          <p>Fuentes, tamaños, espaciados y efectos</p>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">tipografia.css</span>
+        </div>
+        <pre><span class="cm">/* ── FUENTES EXTERNAS (Google Fonts) ── */</span>
+<span class="tg">@import</span> <span class="fn">url</span>(<span class="st">'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap'</span>);
+
+<span class="cm">/* ── FUENTE PERSONALIZADA (archivo local) ── */</span>
+<span class="tg">@font-face</span> <span class="pn">{</span>
+  <span class="at">font-family</span>: <span class="st">'MiFuente'</span>;
+  <span class="at">src</span>: <span class="fn">url</span>(<span class="st">'fonts/mifuente.woff2'</span>) <span class="fn">format</span>(<span class="st">'woff2'</span>);
+  <span class="at">font-weight</span>: <span class="vl">normal</span>;
+  <span class="at">font-style</span>: <span class="vl">normal</span>;
+<span class="pn">}</span>
+
+<span class="cm">/* ── PROPIEDADES DE FUENTE ── */</span>
+<span class="tg">p</span> <span class="pn">{</span>
+  <span class="at">font-family</span>:   <span class="st">'Montserrat'</span>, <span class="vl">sans-serif</span>; <span class="cm">/* con fallback */</span>
+  <span class="at">font-size</span>:     <span class="vl">1rem</span>;
+  <span class="at">font-weight</span>:   <span class="vl">400</span>;        <span class="cm">/* 100-900 */</span>
+  <span class="at">font-style</span>:    <span class="vl">italic</span>;
+  <span class="at">line-height</span>:   <span class="vl">1.7</span>;        <span class="cm">/* espaciado entre líneas */</span>
+  <span class="at">letter-spacing</span>:<span class="vl">.05em</span>;     <span class="cm">/* espacio entre letras */</span>
+  <span class="at">word-spacing</span>:  <span class="vl">.1em</span>;       <span class="cm">/* espacio entre palabras */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── ALINEACIÓN Y TRANSFORMACIÓN ── */</span>
+<span class="tg">.titulo</span> <span class="pn">{</span>
+  <span class="at">text-align</span>:      <span class="vl">center</span>;          <span class="cm">/* left|right|center|justify */</span>
+  <span class="at">text-transform</span>:  <span class="vl">uppercase</span>;       <span class="cm">/* uppercase|lowercase|capitalize */</span>
+  <span class="at">text-decoration</span>: <span class="vl">none</span>;            <span class="cm">/* none|underline|line-through */</span>
+  <span class="at">text-indent</span>:     <span class="vl">2em</span>;             <span class="cm">/* sangría */</span>
+  <span class="at">white-space</span>:     <span class="vl">nowrap</span>;          <span class="cm">/* no dividir en líneas */</span>
+  <span class="at">overflow</span>:        <span class="vl">hidden</span>;
+  <span class="at">text-overflow</span>:   <span class="vl">ellipsis</span>;        <span class="cm">/* texto largo → "..." */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── GRADIENTE EN TEXTO (CSS3 moderno) ── */</span>
+<span class="tg">.texto-degradado</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="fn">linear-gradient</span>(<span class="nm">135deg</span>, <span class="vl">#ec4899</span>, <span class="vl">#8b5cf6</span>);
+  <span class="at">-webkit-background-clip</span>: <span class="vl">text</span>;
+  <span class="at">-webkit-text-fill-color</span>: <span class="vl">transparent</span>;
+  <span class="at">background-clip</span>: <span class="vl">text</span>;
+<span class="pn">}</span></pre>
+      </div>
+
+      <div class="prop-grid">
+        <div class="prop-card pink"><div class="prop-name">font-family</div><div class="prop-desc">Define la fuente. Siempre incluir fuente de respaldo: 'Fuente', sans-serif.</div></div>
+        <div class="prop-card violet"><div class="prop-name">font-size</div><div class="prop-desc">Tamaño del texto. Preferir rem o em sobre px para accesibilidad.</div></div>
+        <div class="prop-card teal"><div class="prop-name">font-weight</div><div class="prop-desc">Grosor: 100 (delgado) a 900 (negro). 400 = normal, 700 = negrita.</div></div>
+        <div class="prop-card amber"><div class="prop-name">line-height</div><div class="prop-desc">Altura de línea. 1.5 a 1.7 es ideal para lectura cómoda.</div></div>
+        <div class="prop-card sky"><div class="prop-name">letter-spacing</div><div class="prop-desc">Espacio entre caracteres. Valores positivos separan, negativos juntan.</div></div>
+        <div class="prop-card green"><div class="prop-name">text-shadow</div><div class="prop-desc">Sombra del texto: offset-x offset-y blur color. Se pueden apilar varias.</div></div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 7 – FLEXBOX ═══════════ -->
+    <div id="flexbox">
+      <div class="chapter">
+        <div class="ch-num">07</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 07</div>
+          <h2>Flexbox</h2>
+          <p>El sistema de layout unidimensional</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Flexbox es el sistema de layout de CSS3 para organizar elementos en <strong>una dimensión</strong> (fila o columna). Resuelve de forma elegante la alineación, distribución y ordenamiento de elementos que antes requerían hacks complejos.</p>
+      </div>
+
+      <!-- Visual demo flexbox -->
+      <div class="flex-demo">
+        <div class="flex-demo-title">justify-content: space-between</div>
+        <div class="flex-row" style="justify-content:space-between;">
+          <div class="flex-item">item 1</div>
+          <div class="flex-item">item 2</div>
+          <div class="flex-item">item 3</div>
+        </div>
+        <div class="flex-demo-title" style="margin-top:16px;">align-items: center + flex: 1</div>
+        <div class="flex-row" style="align-items:center;">
+          <div class="flex-item">fijo</div>
+          <div class="flex-item grow">flex: 1 (crece)</div>
+          <div class="flex-item">fijo</div>
+        </div>
+        <div class="flex-demo-title" style="margin-top:16px;">justify-content: center</div>
+        <div class="flex-row" style="justify-content:center;">
+          <div class="flex-item center">centrado</div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">flexbox.css</span>
+        </div>
+        <pre><span class="cm">/* ── CONTENEDOR FLEX ── */</span>
+<span class="tg">.contenedor</span> <span class="pn">{</span>
+  <span class="at">display</span>:         <span class="vl">flex</span>;
+  <span class="at">flex-direction</span>:  <span class="vl">row</span>;         <span class="cm">/* row|row-reverse|column|column-reverse */</span>
+  <span class="at">flex-wrap</span>:       <span class="vl">wrap</span>;        <span class="cm">/* nowrap|wrap|wrap-reverse */</span>
+  <span class="at">justify-content</span>: <span class="vl">space-between</span>; <span class="cm">/* eje principal */</span>
+  <span class="cm">/* flex-start|flex-end|center|space-between|space-around|space-evenly */</span>
+  <span class="at">align-items</span>:     <span class="vl">center</span>;      <span class="cm">/* eje secundario */</span>
+  <span class="cm">/* stretch|flex-start|flex-end|center|baseline */</span>
+  <span class="at">align-content</span>:   <span class="vl">flex-start</span>;  <span class="cm">/* múltiples líneas */</span>
+  <span class="at">gap</span>:             <span class="vl">16px</span>;        <span class="cm">/* espacio entre elementos */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── ELEMENTOS FLEX ── */</span>
+<span class="tg">.item</span> <span class="pn">{</span>
+  <span class="at">flex</span>:        <span class="vl">1</span>;      <span class="cm">/* crece para ocupar espacio disponible */</span>
+  <span class="at">flex-grow</span>:   <span class="vl">1</span>;      <span class="cm">/* capacidad de crecer */</span>
+  <span class="at">flex-shrink</span>: <span class="vl">0</span>;      <span class="cm">/* no se encoge */</span>
+  <span class="at">flex-basis</span>:  <span class="vl">200px</span>; <span class="cm">/* tamaño base antes de crecer/encoger */</span>
+  <span class="at">align-self</span>:  <span class="vl">flex-end</span>; <span class="cm">/* sobrescribe align-items del padre */</span>
+  <span class="at">order</span>:       <span class="vl">2</span>;      <span class="cm">/* orden visual (default 0) */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── PATRÓN CENTRADO PERFECTO ── */</span>
+<span class="tg">.centrar</span> <span class="pn">{</span>
+  <span class="at">display</span>:         <span class="vl">flex</span>;
+  <span class="at">align-items</span>:     <span class="vl">center</span>;
+  <span class="at">justify-content</span>: <span class="vl">center</span>;
+  <span class="cm">/* ¡El truco del millón! ↑ */</span>
+<span class="pn">}</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 8 – GRID ═══════════ -->
+    <div id="grid">
+      <div class="chapter">
+        <div class="ch-num">08</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 08</div>
+          <h2>CSS Grid</h2>
+          <p>El sistema de layout bidimensional</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>CSS Grid es el sistema más poderoso para diseño web. A diferencia de Flexbox (1D), Grid trabaja en <strong>dos dimensiones</strong> simultáneamente: filas y columnas. Es ideal para layouts completos de páginas.</p>
+      </div>
+
+      <div class="flex-demo">
+        <div class="flex-demo-title">grid-template-columns: repeat(3, 1fr) con span</div>
+        <div class="grid-demo">
+          <div class="g-item span3">Header (span 3)</div>
+          <div class="g-item">Sidebar</div>
+          <div class="g-item span2">Main (span 2)</div>
+          <div class="g-item span3">Footer (span 3)</div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">css-grid.css</span>
+        </div>
+        <pre><span class="cm">/* ── CONTENEDOR GRID ── */</span>
+<span class="tg">.grid</span> <span class="pn">{</span>
+  <span class="at">display</span>: <span class="vl">grid</span>;
+
+  <span class="cm">/* 3 columnas iguales */</span>
+  <span class="at">grid-template-columns</span>: <span class="fn">repeat</span>(<span class="nm">3</span>, <span class="vl">1fr</span>);
+
+  <span class="cm">/* Columnas con tamaños distintos */</span>
+  <span class="at">grid-template-columns</span>: <span class="vl">250px 1fr 200px</span>;
+
+  <span class="cm">/* Auto-fill responsivo sin media queries */</span>
+  <span class="at">grid-template-columns</span>: <span class="fn">repeat</span>(<span class="fn">auto-fill</span>, <span class="fn">minmax</span>(<span class="nm">250px</span>, <span class="vl">1fr</span>));
+
+  <span class="at">grid-template-rows</span>: <span class="vl">auto 1fr auto</span>;
+  <span class="at">gap</span>: <span class="vl">20px</span>;          <span class="cm">/* espacio entre filas y columnas */</span>
+  <span class="at">row-gap</span>: <span class="vl">20px</span>;      <span class="cm">/* solo filas */</span>
+  <span class="at">column-gap</span>: <span class="vl">16px</span>;  <span class="cm">/* solo columnas */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── ELEMENTOS GRID ── */</span>
+<span class="tg">.header</span> <span class="pn">{</span>
+  <span class="at">grid-column</span>: <span class="vl">1 / -1</span>;    <span class="cm">/* de columna 1 a la última */</span>
+  <span class="at">grid-column</span>: <span class="fn">span</span> <span class="nm">3</span>;    <span class="cm">/* ocupa 3 columnas */</span>
+<span class="pn">}</span>
+<span class="tg">.sidebar</span> <span class="pn">{</span>
+  <span class="at">grid-row</span>: <span class="vl">2 / 4</span>;         <span class="cm">/* de fila 2 a la 4 */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── LAYOUT COMPLETO CON NAMED AREAS ── */</span>
+<span class="tg">.pagina</span> <span class="pn">{</span>
+  <span class="at">display</span>: <span class="vl">grid</span>;
+  <span class="at">grid-template-areas</span>:
+    <span class="st">"header  header"</span>
+    <span class="st">"sidebar main  "</span>
+    <span class="st">"footer  footer"</span>;
+  <span class="at">grid-template-columns</span>: <span class="vl">240px 1fr</span>;
+<span class="pn">}</span>
+<span class="tg">.header</span>  <span class="pn">{</span> <span class="at">grid-area</span>: <span class="vl">header</span>; <span class="pn">}</span>
+<span class="tg">.sidebar</span> <span class="pn">{</span> <span class="at">grid-area</span>: <span class="vl">sidebar</span>; <span class="pn">}</span>
+<span class="tg">.main</span>    <span class="pn">{</span> <span class="at">grid-area</span>: <span class="vl">main</span>; <span class="pn">}</span>
+<span class="tg">.footer</span>  <span class="pn">{</span> <span class="at">grid-area</span>: <span class="vl">footer</span>; <span class="pn">}</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ═══════════ CAP 9 – ANIMACIONES ═══════════ -->
+    <div id="animaciones">
+      <div class="chapter">
+        <div class="ch-num">09</div>
+        <div class="ch-text">
+          <div class="ch-label">Capítulo 09</div>
+          <h2>Transiciones, Transformaciones y Animaciones</h2>
+          <p>CSS3 le da vida a la interfaz</p>
+        </div>
+      </div>
+      <div class="prose">
+        <p>CSS3 permite crear movimiento sin una sola línea de JavaScript. Las <strong>transiciones</strong> interpolan entre dos estados, las <strong>transformaciones</strong> mueven y deforman elementos, y las <strong>animaciones</strong> crean secuencias completas con keyframes.</p>
+      </div>
+
+      <div class="visual-demos">
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:var(--css-pink);transition:all .3s;border-radius:50%;cursor:pointer;" onmouseover="this.style.borderRadius='12px';this.style.background='var(--css-violet)'" onmouseout="this.style.borderRadius='50%';this.style.background='var(--css-pink)'"></div>
+          <div class="v-demo-title">TRANSITION (hover)</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:var(--css-violet);animation:spin 3s linear infinite;border-radius:8px;"></div>
+          <div class="v-demo-title">ROTATE</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:var(--css-teal);animation:bounce 1.2s ease-in-out infinite;border-radius:8px;"></div>
+          <div class="v-demo-title">BOUNCE</div>
+        </div>
+        <div class="v-demo">
+          <div class="v-demo-box" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);animation:pulse2 1.5s ease-in-out infinite;border-radius:8px;"></div>
+          <div class="v-demo-title">SCALE PULSE</div>
+        </div>
+      </div>
+      <style>
+        @keyframes spin    { to { transform: rotate(360deg); } }
+        @keyframes bounce  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+        @keyframes pulse2  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+      </style>
+
+      <div class="code-wrap">
+        <div class="code-top">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-fname">animaciones.css</span>
+        </div>
+        <pre><span class="cm">/* ── TRANSICIONES ── */</span>
+<span class="tg">.boton</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="vl">#ec4899</span>;
+  <span class="at">transition</span>: <span class="vl">all .3s ease</span>;       <span class="cm">/* propiedad duración timing */</span>
+  <span class="at">transition</span>: <span class="vl">background .2s ease, transform .3s cubic-bezier(.34,1.56,.64,1)</span>;
+<span class="pn">}</span>
+<span class="tg">.boton:hover</span> <span class="pn">{</span>
+  <span class="at">background</span>: <span class="vl">#8b5cf6</span>;
+  <span class="at">transform</span>: <span class="fn">translateY</span>(<span class="nm">-4px</span>);
+<span class="pn">}</span>
+
+<span class="cm">/* ── TRANSFORMACIONES ── */</span>
+<span class="tg">.transformar</span> <span class="pn">{</span>
+  <span class="at">transform</span>: <span class="fn">translateX</span>(<span class="nm">20px</span>);        <span class="cm">/* mover en X */</span>
+  <span class="at">transform</span>: <span class="fn">translateY</span>(<span class="nm">-10px</span>);       <span class="cm">/* mover en Y */</span>
+  <span class="at">transform</span>: <span class="fn">scale</span>(<span class="nm">1.2</span>);              <span class="cm">/* escalar 120% */</span>
+  <span class="at">transform</span>: <span class="fn">rotate</span>(<span class="nm">45deg</span>);           <span class="cm">/* rotar 45 grados */</span>
+  <span class="at">transform</span>: <span class="fn">skew</span>(<span class="nm">10deg</span>, <span class="nm">5deg</span>);       <span class="cm">/* sesgar */</span>
+  <span class="at">transform</span>: <span class="fn">translate</span>(<span class="nm">10px</span>,<span class="nm">-5px</span>) <span class="fn">scale</span>(<span class="nm">1.1</span>) <span class="fn">rotate</span>(<span class="nm">3deg</span>); <span class="cm">/* combinar */</span>
+  <span class="at">transform-origin</span>: <span class="vl">center center</span>;   <span class="cm">/* punto de origen */</span>
+<span class="pn">}</span>
+
+<span class="cm">/* ── ANIMACIONES CON KEYFRAMES ── */</span>
+<span class="tg">@keyframes</span> <span class="fn">flotarArriba</span> <span class="pn">{</span>
+  <span class="nm">0%</span>   <span class="pn">{</span> <span class="at">transform</span>: <span class="fn">translateY</span>(<span class="nm">0</span>);     <span class="at">opacity</span>: <span class="vl">1</span>; <span class="pn">}</span>
+  <span class="nm">50%</span>  <span class="pn">{</span> <span class="at">transform</span>: <span class="fn">translateY</span>(<span class="nm">-15px</span>); <span class="at">opacity</span>: <span class="vl">.8</span>; <span class="pn">}</span>
+  <span class="nm">100%</span> <span class="pn">{</span> <span class="at">transform</span>: <span class="fn">translateY</span>(<span class="nm">0</span>);     <span class="at">opacity</span>: <span class="vl">1</span>; <span class="pn">}</span>
+<span class="pn">}</span>
+
+<span class="tg">.elemento</span> <span class="pn">{</span>
+  <span class="at">animation-name</span>:            <span class="vl">flotarArriba</span>;
+  <span class="at">animation-duration</span>:        <span class="vl">2s</span>;
+  <span class="at">animation-timing-function</span>: <span class="vl">ease-in-out</span>;
+  <span class="at">animation-delay</span>:           <span class="vl">.5s</span>;
+  <span class="at">animation-iteration-count</span>: <span class="vl">infinite</span>;
+  <span class="at">animation-direction</span>:       <span class="vl">alternate</span>;
+  <span class="at">animation-fill-mode</span>:       <span class="vl">forwards</span>;
+  <span class="cm">/* Shorthand: */</span>
+  <span class="at">animation</span>: <span class="vl">flotarArriba 2s ease-in-out .5s infinite alternate</span>;
+<span class="pn">}</span>
+
+<span class="cm">/* ── MEDIA QUERIES (diseño responsivo) ── */</span>
+<span class="tg">@media</span> (<span class="at">max-width</span>: <span class="vl">768px</span>) <span class="pn">{</span>
+  <span class="tg">.grid</span> <span class="pn">{</span> <span class="at">grid-template-columns</span>: <span class="vl">1fr</span>; <span class="pn">}</span>
+  <span class="tg">.titulo</span> <span class="pn">{</span> <span class="at">font-size</span>: <span class="vl">2rem</span>; <span class="pn">}</span>
+<span class="pn">}</span>
+<span class="tg">@media</span> (<span class="at">prefers-color-scheme</span>: <span class="vl">dark</span>) <span class="pn">{</span>
+  <span class="tg">:root</span> <span class="pn">{</span> <span class="at">--bg</span>: <span class="vl">#0f0f1a</span>; <span class="at">--text</span>: <span class="vl">#fff</span>; <span class="pn">}</span>
+<span class="pn">}</span></pre>
+      </div>
+
+      <div class="pull-quote">
+        <p>"CSS no es solo presentación. Es la diferencia entre una página que se ve y una que se siente."</p>
+        <cite>— Principio del diseño web moderno</cite>
+      </div>
+
+      <div class="info-box tip">
+        <div class="ib-icon">🚀</div>
+        <p><strong>Siguientes pasos:</strong> Ya dominas CSS3. El camino natural es aprender <strong>JavaScript</strong> para hacer tus diseños interactivos, y luego frameworks como <strong>React</strong> o <strong>Vue</strong> para construir aplicaciones completas. ¡Tu portafolio ya tiene bases sólidas!</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p><strong>Escuela:</strong> Centro de Bachillerato Tecnológico Industrial y de Servicios 144</p>
+    <p><strong>Especialidad:</strong> Inteligencia Artificial</p>
+    <p><strong>Profesor:</strong> Jordy Chirino Balcazar</p>
+  </footer>
+
+</body>
+</html>
